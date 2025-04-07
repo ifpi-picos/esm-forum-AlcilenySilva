@@ -1,5 +1,5 @@
 const modelo = require('../modelo.js');
-
+const bd = require('../bd/bd_utils.js');
 // mock de bd, inicialmente vazio
 var mock_bd = {};
 
@@ -45,5 +45,6 @@ test('Testando listar três perguntas', () => {
   expect(perguntas[0].num_respostas).toBe(5);
   expect(perguntas[1].num_respostas).toBe(10);
   expect(perguntas[2].num_respostas).toBe(15);
+  console.log(perguntas); 
 });
   
