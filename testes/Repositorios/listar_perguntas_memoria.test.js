@@ -1,6 +1,8 @@
-const modelo = require('../../modelo');
-const repositorioMemoria = require('./repositorio_memoria');
+//const modelo = require('../../modelo');
+//const repositorioMemoria = require('./repositorio_memoria');
 
+import * as modelo from '../../modelo.js';
+import repositorioMemoria from './repositorio_memoria.js';
 beforeEach(() => {
   // Troca o repositório padrão pelo de memória
   modelo.reconfig_repositorio(repositorioMemoria);

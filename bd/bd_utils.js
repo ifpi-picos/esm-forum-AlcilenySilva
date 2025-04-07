@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./bd/esmforum.db');
 
+let db = new sqlite3.Database('forum.db');
 // Função para reconectar (opcional, pois o sqlite3 não suporta reconfiguração direta)
 function reconfig(nome) {
   db.close(); // Fecha a conexão antiga
