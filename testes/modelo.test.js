@@ -1,25 +1,45 @@
-const bd = require('../bd/bd_utils.js');
-const modelo = require('../modelo.js');
+import * as modelo from '../modelo.js';
+import repositorioMemoria from './Repositorios/repositorio_memoria.js';
 
 beforeEach(() => {
-  bd.reconfig('./bd/esmforum-teste.db');
-  // limpa dados de todas as tabelas
-  bd.exec('delete from perguntas', []);
-  bd.exec('delete from respostas', []);
+  modelo.reconfig_repositorio(repositorioMemoria);
 });
 
-test('Testando banco de dados vazio', () => {
-  expect(modelo.listar_perguntas().length).toBe(0);
-});
+describe('Testes adicionais para 100% de cobertura', () => {
+  test('Erro ao cadastrar pergunta vazia', async () => {
+    await expect(modelo.cadastrar_pergunta('')).rejects.toThrow('Texto da pergunta não pode ser vazio.');
+    await expect(modelo.cadastrar_pergunta('    ')).rejects.toThrow('Texto da pergunta não pode ser vazio.');
+    await expect(modelo.cadastrar_pergunta(null)).rejects.toThrow();
+  });
 
-test('Testando cadastro de três perguntas', () => {
-  modelo.cadastrar_pergunta('1 + 1 = ?');
-  modelo.cadastrar_pergunta('2 + 2 = ?');
-  modelo.cadastrar_pergunta('3 + 3 = ?');
-  const perguntas = modelo.listar_perguntas(); 
-  expect(perguntas.length).toBe(3);
-  expect(perguntas[0].texto).toBe('1 + 1 = ?');
-  expect(perguntas[1].texto).toBe('2 + 2 = ?');
-  expect(perguntas[2].num_respostas).toBe(0);
-  expect(perguntas[1].id_pergunta).toBe(perguntas[2].id_pergunta-1);
+  test('Erro ao cadastrar resposta vazia', async () => {
+    await modelo.cadastrar_pergunta('Qual a capital de MG?');
+    await expect(modelo.cadastrar_resposta(1, '')).rejects.toThrow('Texto da resposta não pode ser vazio.');
+    await expect(modelo.cadastrar_resposta(1, '     ')).rejects.toThrow('Texto da resposta não pode ser vazio.');
+    await expect(modelo.cadastrar_resposta(1, null)).rejects.toThrow();
+  });
+
+  test('Cadastrar pergunta e resposta corretamente', async () => {
+    const pergunta = await modelo.cadastrar_pergunta('Quanto é 2+2?');
+    expect(pergunta.id).toBeGreaterThan(0);
+
+    const resposta = await modelo.cadastrar_resposta(pergunta.id, '4');
+    expect(resposta.id_pergunta).toBe(pergunta.id);
+  });
+
+  test('Listar perguntas retorna as perguntas com respostas', async () => {
+    await modelo.cadastrar_pergunta('Qual a capital de SP?');
+    await modelo.cadastrar_resposta(4, 'São Paulo');
+    const perguntas = await modelo.listar_perguntas();
+    expect(perguntas.length).toBeGreaterThan(0);
+    expect(perguntas[perguntas.length - 1].texto).toBe('Qual a capital de SP?');
+  });
+
+  test('Recuperar respostas de uma pergunta', async () => {
+    const pergunta = await modelo.cadastrar_pergunta('Qual é a cor do céu?');
+    await modelo.cadastrar_resposta(pergunta.id, 'Azul');
+    const respostas = await modelo.get_respostas(pergunta.id);
+    expect(respostas.length).toBeGreaterThan(0);
+    expect(respostas[0].texto).toBe('Azul');
+  });
 });

@@ -1,19 +1,22 @@
 {
   "name": "esm-novo",
   "version": "1.0.0",
+  "type": "module",
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "jest"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "better-sqlite3": "^7.6.2",
     "ejs": "^3.1.8",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6"
   },
   "devDependencies": {
     "jest": "^29.3.0"
   }
+ 
 }
